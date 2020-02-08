@@ -3,13 +3,20 @@ import os
 from phue import Bridge
 
 
-def connect():
-    ip = os.getenv('HUE_BRIDGE_IP')
-    b = Bridge(ip)
-    try:
-        b.connect()
-    except Exception:
-        print('Failed to connect to Hue Bridge')
-        raise
+class Connection:
+    connection = None
 
-    return b
+    def connect(self):
+        if self.connection:
+            return self.connection
+
+        ip = os.getenv('HUE_BRIDGE_IP')
+        b = Bridge(ip)
+        try:
+            b.connect()
+        except Exception:
+            print('Failed to connect to Hue Bridge')
+            raise
+
+        self.connection = b
+        return self.connection
