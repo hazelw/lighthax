@@ -19,13 +19,16 @@ def show_lights():
         return
 
     print("Here are your current lights:")
-    for light in lights:
-        print('ID: ' + str(light.light_id))
-        print('Name: ' + light.name)
-        print('On?: ' + str(light.on))
-        print('Brightness: ' + str(light.brightness))
-        print('Hue: ' + str(light.hue))
-        print('Saturation: ' + str(light.saturation))
+    for light in lights:    
+        info = [
+            f'ID: {light.light_id}',
+            f'Name: {light.name}',
+            f'On: {light.on}',
+            f'Brightness: {light.brightness}',
+            f'Hue: {light.hue}',
+            f'Saturation: {light.saturation}'
+        ]
+        print('\n'.join(info))
         print()
 
 
