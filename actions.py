@@ -1,7 +1,9 @@
+import random
 import threading
 import time
 
 from connection import Connection
+from constants import Colour
 from exceptions import InvalidHueError
 from validation import validate_light_id, validate_hue, validate_brightness
 
@@ -89,3 +91,26 @@ def infinite_rainbow(light_id, speed=0.1):
 
         current_hue = new_hue
         time.sleep(speed)
+
+
+def rise_and_fall(light_id, speed=0.001):
+    validate_light_id(light_id)
+
+    light = connection.get_light(light_id)
+    current_hue = light['state']['hue']
+    next_hue = random.choice(list(Colour)).value
+
+    direction = 'increment' if next_hue > current_hue else 'decrement'
+
+    while True:
+        if current_hue == next_hue:
+            sleep(30)
+            rise_and_fall(light_id, speed=speed)
+        elif direction == 'increment':
+            current_hue = current_hue + 1
+            set_light_hue(light_id, current_hue)
+        elif direction == 'decrement':
+            current_hue = current_hue - 1
+            set_light_hue(light_id, current_hue)
+        else:
+            raise Exception('this shouldn\'t happen')
