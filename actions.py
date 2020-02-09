@@ -93,24 +93,49 @@ def infinite_rainbow(light_id, speed=0.1):
         time.sleep(speed)
 
 
-def rise_and_fall(light_id, speed=0.001):
+def rise_and_fall_all_lights(speed=0.1):
+    lights = connection.lights
+
+    threads = [
+        threading.Thread(target=rise_and_fall, args=(light.light_id, speed))
+        for light in lights
+    ]
+    for thread in threads:
+        thread.start()
+
+
+def rise_and_fall(light_id, speed=0.1):
     validate_light_id(light_id)
 
     light = connection.get_light(light_id)
     current_hue = light['state']['hue']
     next_hue = random.choice(list(Colour)).value
+    current_brightness = light['state']['bri']
+    next_brightness = random.randint(0, 255)
 
-    direction = 'increment' if next_hue > current_hue else 'decrement'
+    hue_change = 100 if next_hue > current_hue else -100
+    brightness_change = 10 if next_brightness > current_brightness else -10
+
+    hue_transition_complete = False
+    brightness_transition_complete = False
 
     while True:
-        if current_hue == next_hue:
-            sleep(30)
-            rise_and_fall(light_id, speed=speed)
-        elif direction == 'increment':
-            current_hue = current_hue + 1
+        if abs(current_hue - next_hue) < 100:
+            hue_transition_complete = True
+        if abs(current_brightness - next_brightness) < 10:
+            brightness_transition_complete = True
+
+        if hue_transition_complete and brightness_transition_complete:
+            break
+
+        current_hue = current_hue + hue_change
+        current_brightness = current_brightness + brightness_change
+        
+        if not hue_transition_complete:
             set_light_hue(light_id, current_hue)
-        elif direction == 'decrement':
-            current_hue = current_hue - 1
-            set_light_hue(light_id, current_hue)
-        else:
-            raise Exception('this shouldn\'t happen')
+        if not brightness_transition_complete:
+            set_light_brightness(light_id, current_brightness)
+        time.sleep(speed)
+
+    time.sleep(10)
+    rise_and_fall(light_id, speed=speed)
