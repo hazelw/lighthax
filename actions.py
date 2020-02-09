@@ -60,7 +60,7 @@ def set_light_hue(light_id, hue):
     connection.set_light(light_id, 'hue', hue)
 
 
-def infinite_rainbow_all_lights(speed=0.1, force_synchronicity=False):
+def infinite_rainbow_all_lights(speed=0.001, force_synchronicity=False):
     lights = connection.lights
 
     if force_synchronicity:
@@ -78,7 +78,7 @@ def infinite_rainbow_all_lights(speed=0.1, force_synchronicity=False):
         thread.start()
 
 
-def infinite_rainbow(light_id, speed=0.1):
+def infinite_rainbow(light_id, speed=0.001):
     validate_light_id(light_id)
 
     light = connection.get_light(light_id)
@@ -96,18 +96,21 @@ def infinite_rainbow(light_id, speed=0.1):
         time.sleep(speed)
 
 
-def rise_and_fall_all_lights(speed=0.1):
+def rise_and_fall_all_lights(speed=0.001, pause_length=10):
     lights = connection.lights
 
     threads = [
-        threading.Thread(target=rise_and_fall, args=(light.light_id, speed))
+        threading.Thread(
+            target=rise_and_fall,
+            args=(light.light_id, speed, pause_length)
+        )
         for light in lights
     ]
     for thread in threads:
         thread.start()
 
 
-def rise_and_fall(light_id, speed=0.1):
+def rise_and_fall(light_id, speed=0.001, pause_length=10):
     validate_light_id(light_id)
 
     light = connection.get_light(light_id)
@@ -140,5 +143,5 @@ def rise_and_fall(light_id, speed=0.1):
             set_light_brightness(light_id, current_brightness)
         time.sleep(speed)
 
-    time.sleep(10)
+    time.sleep(pause_length)
     rise_and_fall(light_id, speed=speed)
